@@ -14,6 +14,7 @@ struct ShakeEffect: GeometryEffect {
 struct FlippingTile: View {
     let tile: Tile
     let size: CGFloat
+    let tileColors: [Color]
     let onTap: () -> Void
 
     private var isFlipped: Bool {
@@ -27,7 +28,7 @@ struct FlippingTile: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
-                        colors: [Color(red: 0.98, green: 0.93, blue: 0.89), Color(red: 0.95, green: 0.97, blue: 0.99)],
+                        colors: [tileColors[0].opacity(0.15), tileColors[1].opacity(0.35)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -44,11 +45,7 @@ struct FlippingTile: View {
             RoundedRectangle(cornerRadius: 20)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color(red: 0.78, green: 0.86, blue: 0.98),
-                            Color(red: 0.85, green: 0.95, blue: 0.90),
-                            Color(red: 0.98, green: 0.87, blue: 0.90)
-                        ],
+                        colors: [tileColors[0].opacity(0.9), tileColors[1].opacity(0.7)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -61,8 +58,8 @@ struct FlippingTile: View {
             axis: (x: 0, y: 1, z: 0) // Flip around the Y-axis
         )
         .modifier(ShakeEffect(amount: 8, shakesPerUnit: 4, animatableData: CGFloat(tile.shakeCount)))
-        .animation(.easeOut(duration: 0.35), value: tile.shakeCount)
-        .animation(.easeInOut(duration: 0.4), value: isFlipped)
+        .animation(.easeOut(duration: AnimationDuration.shake), value: tile.shakeCount)
+        .animation(.easeInOut(duration: AnimationDuration.flip), value: isFlipped)
         .onTapGesture {
             onTap()
         }

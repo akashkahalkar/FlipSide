@@ -16,13 +16,18 @@ struct EmojiGenerator {
         }
     }
 
-    func getEmoji(maxCount: Int) -> [String] {
-        let categories = EmojiCategory.allCases.filter { $0.range.count >= maxCount }
+    func getEmoji(maxCount: Int, excluding excluded: EmojiCategory?) -> (emojis: [String], category: EmojiCategory) {
+        var categories = EmojiCategory.allCases.filter { $0.range.count >= maxCount }
+        if let excluded {
+            categories.removeAll { $0 == excluded }
+        }
+        if categories.isEmpty {
+            categories = EmojiCategory.allCases.filter { $0.range.count >= maxCount }
+        }
         guard let selectedCategory = categories.shuffled().first else {
             assertionFailure("no category with supported length found.")
-            return []
+            return ([], .food)
         }
-        return selectedCategory.emojis
+        return (selectedCategory.emojis, selectedCategory)
     }
 }
-
