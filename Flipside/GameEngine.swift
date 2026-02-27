@@ -34,6 +34,7 @@ enum FlipResult {
 struct GameEngine {
     private let emojiGenerator: EmojiGenerator
     private let pairsForLevel: (Int) -> Int
+    private var lastCategory: EmojiGenerator.EmojiCategory?
 
     init(
         emojiGenerator: EmojiGenerator,
@@ -43,9 +44,11 @@ struct GameEngine {
         self.pairsForLevel = pairsForLevel
     }
 
-    func newGame(level: Int) -> GameState {
+    mutating func newGame(level: Int) -> GameState {
         let pairs = max(1, pairsForLevel(level))
-        let emojis = emojiGenerator.getEmoji(maxCount: pairs).prefix(pairs)
+        let result = emojiGenerator.getEmoji(maxCount: pairs, excluding: lastCategory)
+        lastCategory = result.category
+        let emojis = result.emojis.prefix(pairs)
         let contents = (Array(emojis) + Array(emojis)).shuffled()
         let tiles = contents.map { content in
             Tile(id: UUID(), content: content, isFaceUp: false, isMatched: false, shakeCount: 0)

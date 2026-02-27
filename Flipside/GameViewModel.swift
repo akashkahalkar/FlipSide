@@ -16,12 +16,12 @@ class GameViewModel {
     private var engine: GameEngine
     private let scheduler: Scheduler
     private var mismatchWork: Cancellable?
+    private var shakeWork: Cancellable?
     private let previewDelayNanoseconds: UInt64
     private let interstitialDelayNanoseconds: UInt64
     private let levelCompleteDelayNanoseconds: UInt64
     private let endWaitNanoseconds: UInt64
 
-    private let levelsPerGrid: Int
     private let mismatchDelay: TimeInterval
 
     init(
@@ -31,16 +31,12 @@ class GameViewModel {
         previewDelayNanoseconds: UInt64 = 3_000_000_000,
         interstitialDelayNanoseconds: UInt64 = 0,
         levelCompleteDelayNanoseconds: UInt64 = 2_000_000_000,
-        endWaitNanoseconds: UInt64 = 2_000_000_000,
-        levelsPerGrid: Int = 3
+        endWaitNanoseconds: UInt64 = 2_000_000_000
     ) {
-        let safeLevelsPerGrid = max(1, levelsPerGrid)
-        self.levelsPerGrid = safeLevelsPerGrid
         self.engine = GameEngine(
             emojiGenerator: emojiGenerator,
             pairsForLevel: { level in
-                let side = 2 + 2 * ((max(1, level) - 1) / safeLevelsPerGrid)
-                return (side * side) / 2
+                return 8
             }
         )
         self.scheduler = scheduler
@@ -53,8 +49,7 @@ class GameViewModel {
     }
 
     var gridSide: Int {
-        let levelIndex = max(0, state.level - 1)
-        return 2 + 2 * (levelIndex / levelsPerGrid)
+        return 4
     }
 
     func startGame() {
@@ -68,6 +63,8 @@ class GameViewModel {
     private func startLevel(_ level: Int, showInterstitial: Bool) {
         mismatchWork?.cancel()
         mismatchWork = nil
+        shakeWork?.cancel()
+        shakeWork = nil
         state = engine.newGame(level: level)
         state.isBusy = true
 
@@ -113,14 +110,18 @@ class GameViewModel {
 
         let first = indices.0
         let second = indices.1
-        if state.tiles.indices.contains(first) {
-            state.tiles[first].shakeCount += 1
-        }
-        if state.tiles.indices.contains(second) {
-            state.tiles[second].shakeCount += 1
-        }
+        shakeWork?.cancel()
         mismatchWork?.cancel()
-        mismatchWork = scheduler.schedule(after: mismatchDelay) { [weak self] in
+        shakeWork = scheduler.schedule(after: AnimationDuration.flip) { [weak self] in
+            guard let self else { return }
+            if self.state.tiles.indices.contains(first) {
+                self.state.tiles[first].shakeCount += 1
+            }
+            if self.state.tiles.indices.contains(second) {
+                self.state.tiles[second].shakeCount += 1
+            }
+        }
+        mismatchWork = scheduler.schedule(after: AnimationDuration.flip + mismatchDelay) { [weak self] in
             self?.resolveMismatch(first: first, second: second)
         }
     }
