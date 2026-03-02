@@ -29,18 +29,30 @@ struct ContentView: View {
                 } label: {
                     Image(systemName: "gearshape")
                         .imageScale(.medium)
+                        .tint(Color(secondaryColors[1]))
                 }
                 .buttonStyle(.plain).frame(width: 40, height: 40)
             }
 
 
             HStack {
-                Text("Level \(viewModel.state.level)").foregroundStyle(Color(secondaryColors[1]))
+                HStack() {
+                    Text("LEVEL")
+                    Spacer(minLength: 8)
+                    RollingDigitView(value: viewModel.state.level)
+                }
+                .foregroundStyle(Color(secondaryColors[1]))
                 Spacer()
-                Text("Moves \(viewModel.state.moves)").foregroundStyle(Color(secondaryColors[1]))
+                HStack() {
+                    Text("MOVES")
+                    Spacer(minLength: 8)
+                    RollingDigitView(value: viewModel.state.moves)
+                }
+                .foregroundStyle(Color(secondaryColors[1]))
             }
             .padding(.horizontal)
-            .font(.headline)
+            .font(.custom("AvenirNextCondensed-Heavy", size: 30))
+            .fontWeight(.black)
             .foregroundStyle(Color(red: 0.32, green: 0.35, blue: 0.4))
 
             VStack {
@@ -65,7 +77,10 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(Color(secondaryColors[0]))
                 .disabled(viewModel.phase == .previewing || viewModel.phase == .interstitial)
-            }.padding()
+            }
+            .padding()
+            .font(.custom("AvenirNextCondensed-Heavy", size: 30))
+            .fontWeight(.black)
 
 
             GeometryReader { proxy in
@@ -144,7 +159,7 @@ struct ContentView: View {
             }
         })
         .sheet(isPresented: $isShowingSettings) {
-            ThemeSettingsView(selectedThemeName: $selectedThemeName)
+            ThemeSettingsView(selectedThemeName: $selectedThemeName, showSettingsView: $isShowingSettings)
         }
     }
 }

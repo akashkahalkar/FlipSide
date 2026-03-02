@@ -6,9 +6,9 @@ enum FlatColors: String, CaseIterable {
     func colors() -> [UIColor] {
         switch  self {
         case .Sunrise:
-            return [#colorLiteral(red: 0.9411764706, green: 0.5960784314, blue: 0, alpha: 1), #colorLiteral(red: 0.8941176471, green: 0.5764705882, blue: 0.1176470588, alpha: 1), #colorLiteral(red: 0.9647058824, green: 0.2745098039, blue: 0.2745098039, alpha: 1), #colorLiteral(red: 1, green: 0.3450980392, blue: 0.3450980392, alpha: 1)]
+            return [#colorLiteral(red: 0.9411764706, green: 0.5960784314, blue: 0, alpha: 1), #colorLiteral(red: 0.8941176471, green: 0.5764705882, blue: 0.1176470588, alpha: 1), #colorLiteral(red: 0.9647058824, green: 0.2745098039, blue: 0.2745098039, alpha: 1), #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)]
         case .Amin:
-            return [#colorLiteral(red: 0.1450980392, green: 0.4588235294, blue: 0.9882352941, alpha: 1), #colorLiteral(red: 0.1450980392, green: 0.4274509804, blue: 0.9019607843, alpha: 1), #colorLiteral(red: 0.4352941176, green: 0.1137254902, blue: 0.7843137255, alpha: 1), #colorLiteral(red: 0.4156862745, green: 0.06666666667, blue: 0.7960784314, alpha: 1)]
+            return [#colorLiteral(red: 0.1450980392, green: 0.4588235294, blue: 0.9882352941, alpha: 1), #colorLiteral(red: 0.1450980392, green: 0.4274509804, blue: 0.9019607843, alpha: 1), #colorLiteral(red: 0.4352941176, green: 0.1137254902, blue: 0.7843137255, alpha: 1), #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)]
         case .Maldives:
             return [#colorLiteral(red: 0, green: 0.9490196078, blue: 0.9960784314, alpha: 1), #colorLiteral(red: 0.07058823529, green: 0.9019607843, blue: 0.9411764706, alpha: 1), #colorLiteral(red: 0.368627451, green: 0.6470588235, blue: 0.8901960784, alpha: 1), #colorLiteral(red: 0.2745098039, green: 0.4235294118, blue: 0.5450980392, alpha: 1)]
         case .DIMIGO:

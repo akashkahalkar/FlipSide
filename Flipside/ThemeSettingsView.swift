@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ThemeSettingsView: View {
     @Binding var selectedThemeName: String
+    @Binding var showSettingsView: Bool
 
     var body: some View {
         NavigationStack {
@@ -29,6 +30,7 @@ struct ThemeSettingsView: View {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         selectedThemeName = theme.rawValue
+                        showSettingsView.toggle()
                     }
                 }
             }
@@ -38,5 +40,5 @@ struct ThemeSettingsView: View {
 }
 
 #Preview {
-    ThemeSettingsView(selectedThemeName: .constant(FlatColors.Sunrise.rawValue))
+    ThemeSettingsView(selectedThemeName: .constant(FlatColors.Sunrise.rawValue), showSettingsView: .constant(false))
 }
