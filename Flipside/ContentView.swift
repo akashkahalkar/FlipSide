@@ -134,8 +134,6 @@ struct ContentView: View {
             }
             .aspectRatio(1, contentMode: .fit)
             .padding(.top, 20)
-
-
             Spacer()
 
         }
@@ -156,6 +154,16 @@ struct ContentView: View {
                 }
             }
         })
+        .onChange(of: viewModel.state.level) { oldLevel, newLevel in
+            if newLevel > oldLevel {
+                Haptics.levelUp()
+            }
+        }
+        .onChange(of: viewModel.mismatchEventCount) { oldCount, newCount in
+            if newCount > oldCount {
+                Haptics.mismatchShort()
+            }
+        }
         .sheet(isPresented: $isShowingSettings) {
             ThemeSettingsView(selectedThemeName: $selectedThemeName, showSettingsView: $isShowingSettings)
         }

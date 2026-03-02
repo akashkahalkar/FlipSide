@@ -41,10 +41,6 @@ struct RollingDigit: View {
     }
 }
 
-
-
-
-
 #Preview {
     RollingDigitView(value: 999)
 }

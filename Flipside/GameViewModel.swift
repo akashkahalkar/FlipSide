@@ -13,6 +13,7 @@ enum GamePhase: Equatable {
 class GameViewModel {
     private(set) var state: GameState = GameState.defaultState
     private(set) var phase: GamePhase = .idle
+    private(set) var mismatchEventCount: Int = 0
     private var engine: GameEngine
     private let scheduler: Scheduler
     private var mismatchWork: Cancellable?
@@ -107,6 +108,7 @@ class GameViewModel {
 
     private func handleMismatch(indices: (Int, Int)) {
         state.isBusy = true
+        mismatchEventCount += 1
 
         let first = indices.0
         let second = indices.1
@@ -114,11 +116,13 @@ class GameViewModel {
         mismatchWork?.cancel()
         shakeWork = scheduler.schedule(after: AnimationDuration.flip) { [weak self] in
             guard let self else { return }
-            if self.state.tiles.indices.contains(first) {
-                self.state.tiles[first].shakeCount += 1
-            }
-            if self.state.tiles.indices.contains(second) {
-                self.state.tiles[second].shakeCount += 1
+            withAnimation(.easeOut(duration: AnimationDuration.shake)) {
+                if self.state.tiles.indices.contains(first) {
+                    self.state.tiles[first].shakeCount += 1
+                }
+                if self.state.tiles.indices.contains(second) {
+                    self.state.tiles[second].shakeCount += 1
+                }
             }
         }
         mismatchWork = scheduler.schedule(after: AnimationDuration.flip + mismatchDelay) { [weak self] in
