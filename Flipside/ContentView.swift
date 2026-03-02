@@ -38,14 +38,12 @@ struct ContentView: View {
             HStack {
                 HStack() {
                     Text("LEVEL")
-                    Spacer(minLength: 8)
                     RollingDigitView(value: viewModel.state.level)
                 }
                 .foregroundStyle(Color(secondaryColors[1]))
                 Spacer()
                 HStack() {
                     Text("MOVES")
-                    Spacer(minLength: 8)
                     RollingDigitView(value: viewModel.state.moves)
                 }
                 .foregroundStyle(Color(secondaryColors[1]))
