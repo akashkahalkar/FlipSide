@@ -13,5 +13,13 @@ Flip tiles, match emoji pairs, and clear the board in as few moves as possible. 
 - Theme selection screen
 
 ## Screenshots
-![Gameplay Screenshot](./flipside-screenshots/screenshotHidden.PNG)
-![Gameplay Screenshot](./flipside-screenshots/screenshotRevealed.PNG)
+<table>
+  <tr>
+    <td>
+       <img src = "./flipside-screenshots/screenshotHidden.PNG" width = "200" />            
+    </td>
+    <td>
+         <img src = "./flipside-screenshots/screenshotRevealed.PNG" width = "200" />
+    </td>
+  </tr>
+</table>
