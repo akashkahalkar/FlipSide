@@ -30,6 +30,8 @@ struct ContentView: View {
                     Image(systemName: "gearshape")
                         .imageScale(.medium)
                         .tint(Color(secondaryColors[1]))
+                        .foregroundStyle(Color(secondaryColors[1]))
+
                 }
                 .buttonStyle(.plain).frame(width: 40, height: 40)
             }

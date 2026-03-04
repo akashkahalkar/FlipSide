@@ -12,19 +12,16 @@ struct EmojiGenerator {
         }
 
         var emojis: [String] {
-            return range.compactMap { UnicodeScalar($0) }.map { String($0) }
+            return range.compactMap { UnicodeScalar($0) }.map { String($0) }.shuffled()
         }
     }
 
     func getEmoji(maxCount: Int, excluding excluded: EmojiCategory?) -> (emojis: [String], category: EmojiCategory) {
-        var categories = EmojiCategory.allCases.filter { $0.range.count >= maxCount }
-        if let excluded {
-            categories.removeAll { $0 == excluded }
-        }
-        if categories.isEmpty {
-            categories = EmojiCategory.allCases.filter { $0.range.count >= maxCount }
-        }
-        guard let selectedCategory = categories.shuffled().first else {
+        let categories = EmojiCategory.allCases.shuffled()
+            .filter { $0.range.count >= maxCount }
+            .filter { $0.self != excluded }
+
+        guard let selectedCategory = categories.randomElement() else {
             assertionFailure("no category with supported length found.")
             return ([], .food)
         }
