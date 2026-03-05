@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var showGrid: Bool = false
     @AppStorage("selectedTheme") private var selectedThemeName: String = FlatColors.Sunrise.rawValue
     @State private var isShowingSettings: Bool = false
+    @State private var isBreathing: Bool = false
 
     var body: some View {
         let theme = FlatColors(rawValue: selectedThemeName) ?? .Sunrise
@@ -65,6 +66,7 @@ struct ContentView: View {
                 .buttonStyle(.glassProminent)
                 .tint(Color(secondaryColors[0]))
                 .shadow(color: Color(secondaryColors[0]), radius: 5)
+                .scaleEffect(isBreathing ? 1.2 : 1.0)
                 .disabled(viewModel.phase == .previewing || viewModel.phase == .interstitial)
             }
             .padding()
@@ -167,6 +169,24 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingSettings) {
             ThemeSettingsView(selectedThemeName: $selectedThemeName, showSettingsView: $isShowingSettings)
+        }
+        .onAppear {
+            if viewModel.phase == .idle {
+                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                    isBreathing = true
+                }
+            }
+        }
+        .onChange(of: viewModel.phase) { oldValue, newValue in
+            if newValue == .idle {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    isBreathing.toggle()
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    isBreathing = false
+                }
+            }
         }
     }
 }
