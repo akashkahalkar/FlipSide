@@ -12,8 +12,13 @@ enum GamePhase: Equatable {
 @Observable
 class GameViewModel {
     private(set) var state: GameState = GameState.defaultState
-    private(set) var phase: GamePhase = .idle
+    private(set) var phase: GamePhase = .idle {
+        didSet {
+            updateDescription()
+        }
+    }
     private(set) var mismatchEventCount: Int = 0
+    private(set) var description: String = "Tap Start to play"
     private var engine: GameEngine
     private let scheduler: Scheduler
     private var mismatchWork: Cancellable?
@@ -103,6 +108,21 @@ class GameViewModel {
             handleLevelComplete()
         case .mismatchFound(let indices):
             handleMismatch(indices: indices)
+        }
+    }
+
+    func updateDescription() {
+        switch phase {
+            case .idle:
+                description = "Tap Start to play"
+            case .interstitial:
+                description = ""
+            case .levelComplete:
+                description = "Level complete!"
+            case .previewing:
+                description = "Memorize..."
+            case .playing:
+                description = ""
         }
     }
 

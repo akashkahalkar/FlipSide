@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var viewModel = GameViewModel()
     @State private var levelCompleteProgress: Double = 0
+    @State private var showGrid: Bool = false
     @AppStorage("selectedTheme") private var selectedThemeName: String = FlatColors.Sunrise.rawValue
     @State private var isShowingSettings: Bool = false
 
@@ -28,12 +29,11 @@ struct ContentView: View {
                     isShowingSettings = true
                 } label: {
                     Image(systemName: "gearshape")
-                        .imageScale(.medium)
-                        .tint(Color(secondaryColors[1]))
-                        .foregroundStyle(Color(secondaryColors[1]))
-
+                        .imageScale(.large)
+                        .foregroundStyle(Color.white)
                 }
-                .buttonStyle(.plain).frame(width: 40, height: 40)
+                .buttonStyle(.glass)
+                .frame(width: 60, height: 60)
             }
 
 
@@ -56,23 +56,9 @@ struct ContentView: View {
             .foregroundStyle(Color(red: 0.32, green: 0.35, blue: 0.4))
 
             VStack {
-                if viewModel.phase == .previewing {
-                    Text("Memorize...")
-                        .font(.subheadline)
-                        .foregroundStyle(Color(secondaryColors[1]))
-                } else if viewModel.phase == .levelComplete {
-                    Text("Level complete!")
-                        .font(.subheadline)
-                        .foregroundStyle(Color(secondaryColors[1]))
-                } else if viewModel.phase == .idle {
-                    Text("Tap Start to play")
-                        .font(.subheadline)
-                        .foregroundStyle(Color(secondaryColors[1]))
-                }
+                Text(viewModel.description)
                 Button(viewModel.phase == .idle ? "Start" : "Restart") {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                        viewModel.startGame()
-                    }
+                    viewModel.startGame()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Color(secondaryColors[0]))
@@ -82,60 +68,64 @@ struct ContentView: View {
             .font(.custom("AvenirNextCondensed-Heavy", size: 30))
             .fontWeight(.black)
 
+            if showGrid {
+                    GeometryReader { proxy in
+                        let spacing: CGFloat = 12
+                        let gridSize = min(proxy.size.width, proxy.size.height)
+                        let totalSpacing = spacing * CGFloat(max(0, side - 1))
+                        let tileSize = max(12, (gridSize - totalSpacing) / CGFloat(side))
 
-            GeometryReader { proxy in
-                let spacing: CGFloat = 12
-                let gridSize = min(proxy.size.width, proxy.size.height)
-                let totalSpacing = spacing * CGFloat(max(0, side - 1))
-                let tileSize = max(12, (gridSize - totalSpacing) / CGFloat(side))
-
-                ZStack {
-                    if viewModel.phase != .levelComplete {
-                        LazyVGrid(columns: columns, spacing: spacing) {
-                            ForEach(tiles) { tile in
-                                FlippingTile(
-                                    tile: tile,
-                                    size: tileSize,
-                                    tileColors: [Color(secondaryColors[0]), Color(secondaryColors[1])]
-                                ) {
-                                    guard let index = tiles.firstIndex(of: tile) else {
-                                        return
+                        ZStack {
+                            if viewModel.phase != .levelComplete {
+                                LazyVGrid(columns: columns, spacing: spacing) {
+                                    ForEach(tiles) { tile in
+                                        FlippingTile(
+                                            tile: tile,
+                                            size: tileSize,
+                                            tileColors: [Color(secondaryColors[0]), Color(secondaryColors[1])]
+                                        ) {
+                                            guard let index = tiles.firstIndex(of: tile) else {
+                                                return
+                                            }
+                                            viewModel.onTileTap(index)
+                                        }
                                     }
-                                    viewModel.onTileTap(index)
                                 }
+                                .frame(width: gridSize, height: gridSize, alignment: .center)
+                            }
+
+                            if viewModel.phase == .interstitial {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.black.opacity(0.35))
+                                    .frame(width: gridSize, height: gridSize)
+                                    .overlay(
+                                        Text("Level \(viewModel.state.level)")
+                                            .font(.title.bold())
+                                            .foregroundStyle(.white)
+                                    )
+                            } else if viewModel.phase == .levelComplete {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.black.opacity(0.55))
+                                    .frame(width: gridSize, height: gridSize)
+                                    .overlay(
+                                        VStack(spacing: 12) {
+                                            Text("Level \(viewModel.state.level) Complete")
+                                                .font(.title.bold())
+                                                .foregroundStyle(.white)
+                                            ProgressView(value: levelCompleteProgress)
+                                                .tint(.white)
+                                                .frame(width: gridSize * 0.6)
+                                        }
+                                    )
                             }
                         }
-                        .frame(width: gridSize, height: gridSize, alignment: .center)
                     }
+                    .aspectRatio(1, contentMode: .fit)
+                    .padding(.top, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
 
-                    if viewModel.phase == .interstitial {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.black.opacity(0.35))
-                            .frame(width: gridSize, height: gridSize)
-                            .overlay(
-                                Text("Level \(viewModel.state.level)")
-                                    .font(.title.bold())
-                                    .foregroundStyle(.white)
-                            )
-                    } else if viewModel.phase == .levelComplete {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.black.opacity(0.55))
-                            .frame(width: gridSize, height: gridSize)
-                            .overlay(
-                                VStack(spacing: 12) {
-                                    Text("Level \(viewModel.state.level) Complete")
-                                        .font(.title.bold())
-                                        .foregroundStyle(.white)
-                                    ProgressView(value: levelCompleteProgress)
-                                        .tint(.white)
-                                        .frame(width: gridSize * 0.6)
-                                }
-                            )
-                    }
-                }
             }
-            .aspectRatio(1, contentMode: .fit)
-            .padding(.top, 20)
+
             Spacer()
 
         }
@@ -148,7 +138,13 @@ struct ContentView: View {
                 endPoint: .bottom
             )
         )
+        .onAppear {
+            showGrid = viewModel.phase != .idle
+        }
         .onChange(of: viewModel.phase, { _, newPhase in
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.82)) {
+                showGrid = newPhase != .idle
+            }
             if newPhase == .levelComplete {
                 levelCompleteProgress = 0
                 withAnimation(.linear(duration: 2.0)) {
