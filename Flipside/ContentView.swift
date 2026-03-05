@@ -32,7 +32,9 @@ struct ContentView: View {
                         .imageScale(.large)
                         .foregroundStyle(Color.white)
                 }
-                .buttonStyle(.glass)
+                .buttonStyle(.glassProminent)
+                .shadow(color: Color(secondaryColors[0]), radius: 5)
+                .tint(Color(secondaryColors[0]))
                 .frame(width: 60, height: 60)
             }
 
@@ -60,8 +62,9 @@ struct ContentView: View {
                 Button(viewModel.phase == .idle ? "Start" : "Restart") {
                     viewModel.startGame()
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.glassProminent)
                 .tint(Color(secondaryColors[0]))
+                .shadow(color: Color(secondaryColors[0]), radius: 5)
                 .disabled(viewModel.phase == .previewing || viewModel.phase == .interstitial)
             }
             .padding()
